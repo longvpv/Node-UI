@@ -41,6 +41,7 @@ const dashboardRoutes = [
     rtlName: "ملف تعريفي للمستخدم",
     icon: Person,
     layout: "/admin",
+    visible: false,
   },
   {
     path: "/table-list",
@@ -48,6 +49,7 @@ const dashboardRoutes = [
     rtlName: "قائمة الجدول",
     icon: "content_paste",
     layout: "/admin",
+    visible: false,
   },
   {
     path: "/products",
@@ -70,14 +72,14 @@ const dashboardRoutes = [
     icon: ListIcon,
     layout: "/admin",
   },
-  // {
-  //   path: "/rtl-page",
-  //   name: "RTL Support",
-  //   rtlName: "پشتیبانی از راست به چپ",
-  //   icon: Language,
-
-  //   layout: "/rtl",
-  // },
+  {
+    path: "/product/",
+    name: "Product Detail",
+    rtlName: "پشتیبانی از راست به چپ",
+    icon: Unarchive,
+    visible: false,
+    layout: "/admin",
+  },
   // {
   //   path: "/upgrade-to-pro",
   //   name: "Upgrade To PRO",

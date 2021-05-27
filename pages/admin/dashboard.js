@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 // react plugin for creating charts
 import ChartistGraph from "react-chartist";
 // @material-ui/core
@@ -40,10 +40,25 @@ import {
 } from "variables/charts.js";
 
 import styles from "assets/jss/nextjs-material-dashboard/views/dashboardStyle.js";
+import httpClient from "../../services/httpService.tsx";
+import { useSelector } from "react-redux";
 
 function Dashboard() {
   const useStyles = makeStyles(styles);
   const classes = useStyles();
+  const user = useSelector((state) => state.user.userEmail);
+  const [filter, setFilter] = useState({
+    products: 0,
+    users: 0,
+    categories: 0,
+  });
+  useEffect(async () => {
+    httpClient.get("/api").then((res, error) => {
+      if (error) {
+        console.log(error);
+      } else setFilter(res);
+    });
+  }, []);
   return (
     <div>
       <GridContainer>
@@ -53,18 +68,15 @@ function Dashboard() {
               <CardIcon color="warning">
                 <Icon>content_copy</Icon>
               </CardIcon>
-              <p className={classes.cardCategory}>Used Space</p>
+              <p className={classes.cardCategory}>Product</p>
               <h3 className={classes.cardTitle}>
-                49/50 <small>GB</small>
+                {filter.products} <small>item(s)</small>
               </h3>
             </CardHeader>
             <CardFooter stats>
               <div className={classes.stats}>
-                <Danger>
-                  <Warning />
-                </Danger>
                 <a href="#pablo" onClick={(e) => e.preventDefault()}>
-                  Get more space
+                  Create more product !
                 </a>
               </div>
             </CardFooter>
@@ -76,13 +88,13 @@ function Dashboard() {
               <CardIcon color="dark">
                 <Store />
               </CardIcon>
-              <p className={classes.cardCategory}>Revenue</p>
-              <h3 className={classes.cardTitle}>$34,245</h3>
+              <p className={classes.cardCategory}>Categories</p>
+              <h3 className={classes.cardTitle}>{filter.categories}</h3>
             </CardHeader>
             <CardFooter stats>
               <div className={classes.stats}>
                 <DateRange />
-                Last 24 Hours
+                All time
               </div>
             </CardFooter>
           </Card>
@@ -93,8 +105,8 @@ function Dashboard() {
               <CardIcon color="danger">
                 <Icon>info_outline</Icon>
               </CardIcon>
-              <p className={classes.cardCategory}>Fixed Issues</p>
-              <h3 className={classes.cardTitle}>75</h3>
+              <p className={classes.cardCategory}>User Login</p>
+              <h3 className={classes.cardTitleEmail}>{user}</h3>
             </CardHeader>
             <CardFooter stats>
               <div className={classes.stats}>
@@ -110,8 +122,8 @@ function Dashboard() {
               <CardIcon color="info">
                 <Accessibility />
               </CardIcon>
-              <p className={classes.cardCategory}>Followers</p>
-              <h3 className={classes.cardTitle}>+245</h3>
+              <p className={classes.cardCategory}>Users</p>
+              <h3 className={classes.cardTitle}>{filter.users}</h3>
             </CardHeader>
             <CardFooter stats>
               <div className={classes.stats}>
@@ -139,7 +151,7 @@ function Dashboard() {
               <p className={classes.cardCategory}>
                 <span className={classes.successText}>
                   <ArrowUpward className={classes.upArrowCardCategory} /> 55%
-                </span>{" "}
+                </span>
                 increase in today sales.
               </p>
             </CardBody>

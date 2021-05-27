@@ -63,6 +63,21 @@ const dashboardStyle = {
       lineHeight: "1",
     },
   },
+  cardTitleEmail: {
+    color: grayColor[2],
+    marginTop: "0px",
+    minHeight: "auto",
+    fontWeight: "300",
+    fontSize: "24px",
+    fontFamily: "'Roboto', 'Helvetica', 'Arial', sans-serif",
+    marginBottom: "3px",
+    textDecoration: "none",
+    "& small": {
+      color: grayColor[1],
+      fontWeight: "400",
+      lineHeight: "1",
+    },
+  },
   cardTitleWhite: {
     color: whiteColor,
     marginTop: "0px",

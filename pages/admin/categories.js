@@ -10,6 +10,7 @@ import Table from "components/Table/Table.js";
 import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
+import httpClient from "../../services/httpService.tsx";
 
 const styles = {
   cardCategoryWhite: {
@@ -47,26 +48,32 @@ function Categories() {
   const [categories, setCategories] = useState([]);
   const [keyCategories, setKeyCategories] = useState([]);
   useEffect(() => {
-    const data = [
-      {
-        _id: "men",
-        name: "men",
-        description: "Men's Wear",
-      },
-      {
-        _id: "women",
-        name: "women",
-        description: "Women Fashion",
-      },
-      {
-        _id: "accessories",
-        name: "accessories",
-        description: "Bags and Accessories",
-      },
-    ];
-    let newCategories = data.map((i) => Object.values(i));
-    setCategories(newCategories);
-    setKeyCategories(Object.keys(data[0]));
+    httpClient.get("/api/categories").then((value) => {
+      console.log(value);
+      let newCategories = value.map((i) => Object.values(i));
+      setCategories(newCategories);
+      setKeyCategories(Object.keys(value[0]));
+    });
+    // const data = [
+    //   {
+    //     _id: "men",
+    //     name: "men",
+    //     description: "Men's Wear",
+    //   },
+    //   {
+    //     _id: "women",
+    //     name: "women",
+    //     description: "Women Fashion",
+    //   },
+    //   {
+    //     _id: "accessories",
+    //     name: "accessories",
+    //     description: "Bags and Accessories",
+    //   },
+    // ];
+    // let newCategories = data.map((i) => Object.values(i));
+    // setCategories(newCategories);
+    // setKeyCategories(Object.keys(data[0]));
   }, []);
   return (
     <GridContainer>

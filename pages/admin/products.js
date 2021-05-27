@@ -6,12 +6,20 @@ import Admin from "layouts/Admin.js";
 // core components
 import GridItem from "components/Grid/GridItem.js";
 import GridContainer from "components/Grid/GridContainer.js";
-import Table from "components/Table/Table.js";
 import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
-import { Button } from "@material-ui/core";
+import {
+  Button,
+  IconButton,
+  InputAdornment,
+  InputBase,
+  Paper,
+} from "@material-ui/core";
 import { DataGrid } from "@material-ui/data-grid";
+import httpClient from "../../services/httpService.tsx";
+import { useRouter } from "next/router";
+import SearchIcon from "@material-ui/icons/Search";
 const styles = {
   cardCategoryWhite: {
     "&,& a,& a:hover,& a:focus": {
@@ -40,102 +48,160 @@ const styles = {
       lineHeight: "1",
     },
   },
+  input: {
+    marginLeft: "12px",
+    flex: 1,
+  },
+  iconButton: {
+    padding: 10,
+  },
+  root: {
+    marginLeft: "14px",
+    padding: "2px 4px",
+    display: "flex",
+    alignItems: "center",
+    width: 800,
+  },
 };
 
 function Products() {
   const useStyles = makeStyles(styles);
   const classes = useStyles();
+  const router = useRouter();
   const [products, setProducts] = useState([]);
-  const [keyProducts, setKeyProducts] = useState([]);
-  useEffect(() => {
-    const data = [
-      {
-        _id: "5bcbf511696b664906832519",
-        images: [
-          "http://api.demo.nordiccoder.com/images/product_1_1.png",
-          "http://api.demo.nordiccoder.com/images/product_1_2.png",
-        ],
-        thumbnails: [
-          "http://api.demo.nordiccoder.com/images/product_1_1.png",
-          "http://api.demo.nordiccoder.com/images/product_1_2.png",
-        ],
-        name: "Winter Coat from France",
-        image: "http://api.demo.nordiccoder.com/images/product_1.png",
-        thumbnail: "http://api.demo.nordiccoder.com/images/product_1.png",
-        shortDescription: "product 1",
-        categoryId: "men",
-        salePrice: 699,
-        originalPrice: 800,
-      },
-      {
-        _id: "5bcbf511696b66490683251a",
-        images: [
-          "http://api.demo.nordiccoder.com/images/product_2_1.png",
-          "http://api.demo.nordiccoder.com/images/product_2_2.png",
-        ],
-        thumbnails: [
-          "http://api.demo.nordiccoder.com/images/product_2_1.png",
-          "http://api.demo.nordiccoder.com/images/product_2_2.png",
-        ],
-        name: "Italy Bag",
-        image: "http://api.demo.nordiccoder.com/images/product_2.png",
-        thumbnail: "http://api.demo.nordiccoder.com/images/product_2.png",
-        shortDescription: "product 2",
-        categoryId: "women",
-        salePrice: 199,
-        originalPrice: 300,
-      },
-      {
-        _id: "5bcbf511696b66490683251b",
-        images: [
-          "http://api.demo.nordiccoder.com/images/product_3_1.png",
-          "http://api.demo.nordiccoder.com/images/product_3_2.png",
-        ],
-        thumbnails: [
-          "http://api.demo.nordiccoder.com/images/product_3_1.png",
-          "http://api.demo.nordiccoder.com/images/product_3_2.png",
-        ],
-        name: "Coat from France",
-        image: "http://api.demo.nordiccoder.com/images/product_3.png",
-        thumbnail: "http://api.demo.nordiccoder.com/images/product_3.png",
-        shortDescription: "product 3",
-        categoryId: "accessories",
-        salePrice: 599,
-        originalPrice: 800,
-      },
-    ];
-    const newData = data.map((item) => {
+  const [loading, setLoading] = useState(false);
+  const [total, setTotal] = useState(null);
+  const [filter, setFilter] = useState({ pageSize: 2, page: 1, keyword: "" });
+  // const [keyProducts, setKeyProducts] = useState([]);
+  let columns = [
+    { field: "id", headerName: "ID", width: 100, sortable: false },
+    { field: "name", headerName: "Name", width: 250, sortable: false },
+    {
+      field: "categoryId",
+      headerName: "Category",
+      width: 150,
+      sortable: false,
+    },
+    { field: "image", headerName: "Image", width: 250, sortable: false },
+    {
+      field: "originalPrice",
+      headerName: "Original Price",
+      width: 150,
+      sortable: false,
+    },
+    {
+      field: "salePrice",
+      headerName: "Sale Price",
+      width: 150,
+      sortable: false,
+    },
+    {
+      field: "shortDescription",
+      headerName: "Short Description",
+      width: 150,
+      sortable: false,
+    },
+    {
+      field: "action",
+      headerName: "Action",
+      width: 100,
+      sortable: false,
+      renderCell: (params) => buttonAction(params.id),
+    },
+  ];
+  const getData = async (filter) => {
+    setLoading(true);
+    const res = await httpClient.get("api/products", { params: filter });
+    setTotal(res.total);
+    const newData = res.items.map((item) => {
       item["id"] = item["_id"];
       delete item["_id"];
       return item;
     });
-
     setProducts(newData);
-    const newKey = Object.keys(data[0]).map((key) => {
-      if (key === "_id") return;
-      return {
-        field: key,
-        headerName: key,
-      };
-    });
-    setKeyProducts(newKey);
-  }, []);
+    setLoading(false);
+  };
+  useEffect(() => {
+    getData(filter);
+  }, [filter]);
+  const handlePushToProductDetailPage = (id) => {
+    router.push(`product/${id}`);
+  };
   const buttonAction = (id) => (
-    <Button onClick={() => console.log("go to page Product detail ID", id)}>
+    <Button
+      onClick={() => handlePushToProductDetailPage(id)}
+      variant="contained"
+      color="secondary"
+    >
       Detail
     </Button>
   );
-  console.log(products);
   return (
     <GridContainer>
+      <Paper
+        component="form"
+        className={classes.root}
+        onSubmit={(e) => {
+          e.preventDefault();
+          getData({ ...filter, keyword: e.target.keyword.value });
+        }}
+      >
+        <InputBase
+          className={classes.input}
+          id="keyword"
+          placeholder="Search product"
+          fullWidth
+          startAdornment={
+            <InputAdornment position="end">
+              <IconButton
+                className={classes.iconButton}
+                aria-label="search"
+                onClick={(e) => {
+                  e.preventDefault();
+                  console.log(e);
+                }}
+              >
+                <SearchIcon />
+              </IconButton>
+            </InputAdornment>
+          }
+        />
+      </Paper>
       <GridItem xs={12} sm={12} md={12}>
         <Card plain>
           <CardHeader plain color="success">
             <h4 className={classes.cardTitleWhite}>Table of product</h4>
           </CardHeader>
+
           <CardBody>
-            <div style={{ height: 400, width: "100%" }}>
-              <DataGrid pagination rows={products} columns={keyProducts} />
+            <div
+              style={{
+                width: "100%",
+                height: "400px",
+              }}
+            >
+              <Button
+                color="primary"
+                onClick={() => router.push("product/create")}
+              >
+                Create new Product
+              </Button>
+              <DataGrid
+                pagination
+                paginationMode="server"
+                rows={products}
+                columns={columns}
+                pageSize={filter.pageSize}
+                onPageSizeChange={(e) =>
+                  setFilter({ ...filter, page: e.page, pageSize: e.pageSize })
+                }
+                onPageChange={(e) =>
+                  setFilter({ ...filter, page: e.page, pageSize: e.pageSize })
+                }
+                rowsPerPageOptions={[2, 5]}
+                rowCount={total ? total : null}
+                loading={loading}
+              />
             </div>
           </CardBody>
         </Card>

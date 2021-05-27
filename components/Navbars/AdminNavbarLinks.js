@@ -13,16 +13,18 @@ import Divider from "@material-ui/core/Divider";
 // @material-ui/icons
 import Person from "@material-ui/icons/Person";
 import Notifications from "@material-ui/icons/Notifications";
-import Dashboard from "@material-ui/icons/Dashboard";
-import Search from "@material-ui/icons/Search";
 // core components
-import CustomInput from "components/CustomInput/CustomInput.js";
 import Button from "components/CustomButtons/Button.js";
 import useWindowSize from "components/Hooks/useWindowSize.js";
 
 import styles from "assets/jss/nextjs-material-dashboard/components/headerLinksStyle.js";
+import { useRouter } from "next/router";
+import { useSelector } from "react-redux";
+import MasterDialog from "../Dialog/Dialog";
 
 export default function AdminNavbarLinks() {
+  const user = useSelector((state) => state.user.userEmail);
+  const router = useRouter();
   const size = useWindowSize();
   const useStyles = makeStyles(styles);
   const classes = useStyles();
@@ -50,34 +52,11 @@ export default function AdminNavbarLinks() {
   };
   return (
     <div>
-      {/* <div className={classes.searchWrapper}>
-        <CustomInput
-          formControlProps={{
-            className: classes.margin + " " + classes.search,
-          }}
-          inputProps={{
-            placeholder: "Search",
-            inputProps: {
-              "aria-label": "Search",
-            },
-          }}
-        />
-        <Button color="white" aria-label="edit" justIcon round>
-          <Search />
-        </Button>
-      </div> */}
-      <Button
-        color={size.width > 959 ? "transparent" : "white"}
-        justIcon={size.width > 959}
-        simple={!(size.width > 959)}
-        aria-label="Dashboard"
-        className={classes.buttonLink}
-      >
-        <Dashboard className={classes.icons} />
-        <Hidden mdUp implementation="css">
-          <p className={classes.linkText}>Dashboard</p>
-        </Hidden>
-      </Button>
+      {user && (
+        <div className={classes.searchWrapper}>
+          Welcome {user} , you the best !!!
+        </div>
+      )}
       <div className={classes.manager}>
         <Button
           color={size.width > 959 ? "transparent" : "white"}
@@ -195,17 +174,17 @@ export default function AdminNavbarLinks() {
                 <ClickAwayListener onClickAway={handleCloseProfile}>
                   <MenuList role="menu">
                     <MenuItem
-                      onClick={handleCloseProfile}
+                      onClick={() => router.push("/admin/login")}
                       className={classes.dropdownItem}
                     >
                       Login
                     </MenuItem>
                     <Divider light />
                     <MenuItem
-                      onClick={handleCloseProfile}
+                      onClick={() => router.push("/admin/register")}
                       className={classes.dropdownItem}
                     >
-                      Logout
+                      Register
                     </MenuItem>
                   </MenuList>
                 </ClickAwayListener>
@@ -214,6 +193,7 @@ export default function AdminNavbarLinks() {
           )}
         </Poppers>
       </div>
+      <MasterDialog />
     </div>
   );
 }
