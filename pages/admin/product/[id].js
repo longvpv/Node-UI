@@ -20,6 +20,12 @@ import PhotoLibraryIcon from "@material-ui/icons/PhotoLibrary";
 import DescriptionIcon from "@material-ui/icons/Description";
 import MuiAlert from "@material-ui/lab/Alert";
 import CategoryIcon from "@material-ui/icons/Category";
+import Dialog from "@material-ui/core/Dialog";
+import DialogActions from "@material-ui/core/DialogActions";
+import DialogContent from "@material-ui/core/DialogContent";
+import DialogContentText from "@material-ui/core/DialogContentText";
+import DialogTitle from "@material-ui/core/DialogTitle";
+
 function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
 }
@@ -90,6 +96,19 @@ const ProductDetails = (props) => {
       return;
     }
     setOpen(false);
+  };
+
+  const handleDeleteProduct = async () => {
+    try {
+      await httpClient.delete(`api/product/${router.query.id}`);
+      router.back();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  const [openD, setOpenD] = React.useState(false);
+  const actionClose = () => {
+    setOpenD(false);
   };
   return (
     <form onSubmit={formik.handleSubmit}>
@@ -283,6 +302,11 @@ const ProductDetails = (props) => {
                   ? "Update Product"
                   : "Create Product"}
               </Button>
+              {router.query.id !== "create" && (
+                <Button color="danger" onClick={() => setOpenD(true)}>
+                  Delete Product
+                </Button>
+              )}
             </CardFooter>
           </Card>
         </GridItem>
@@ -294,6 +318,31 @@ const ProductDetails = (props) => {
             : "Update complete !"}
         </Alert>
       </Snackbar>
+      <Dialog
+        open={openD}
+        onClose={actionClose}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Do you really wanna delete this product ? This action will be not
+            revertable !
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={actionClose} color="primary">
+            Disagree
+          </Button>
+          <Button
+            onClick={() => handleDeleteProduct()}
+            color="danger"
+            autoFocus
+          >
+            Agree
+          </Button>
+        </DialogActions>
+      </Dialog>
     </form>
   );
 };
